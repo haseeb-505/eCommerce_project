@@ -2,6 +2,7 @@
 
 ## This is an E-Commerce practice project.
 
+<<<<<<< HEAD
 #### Environment Variables:
     PORT, MONOGODB_URI, JWT_ACCESS_TOKEN, JWT_REFRESH_TOKEN,
 
@@ -37,6 +38,8 @@ if accessToken does not match the token in db, we'll grant the user with a refre
 
 
 
+=======
+>>>>>>> 0fb0d6d30ca18226bd24189e689a1dbc2aef7d3f
 ## Explanation of asyncHandler util
 
  * `asyncHandler` is a higher-order function used to wrap async route handlers in Express applications. 
