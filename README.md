@@ -2,37 +2,37 @@
 
 ## This is an E-Commerce practice project.
 
-#### Environment Variables:
+### Environment Variables:
     PORT, MONOGODB_URI, JWT_ACCESS_TOKEN, JWT_REFRESH_TOKEN,
 
-#### User Schema
+### User Schema
  	  username, email, fullName, phone, address,    role, password, avatarPhoto, coverPhoto
 
-#### Utils:
+### Utils:
     passwordHashingFunction, passwordComaprison, using bcrypt
 
-#### UserControllers (Basic User cControllers):
+### UserControllers (Basic User cControllers):
 	registerUser, loginUser, logoutUser, updateAvatar, updateCover, updatePassword, 	passwordReset, 
 
 	later on addition:
 
 	userOrders, userProducts etc
 
-#### Middlerwares (pass the execution context to next):
+### Middlerwares (pass the execution context to next):
 	authMiddleware on the basis of `JWT` token generation, if user's current access token (`headers.authorization`) matches with the token stored in db, then we'll let the user accessing certain routes, it is primarily for logoutRoute, updateAvatar, Cover, passwrod middlewares
 
 if accessToken does not match the token in db, we'll grant the user with a refreshToken
 
-#### UserRoutes:
+### UserRoutes:
 	registerUserRoute, loginRoute, logoutRoute, passwordResetRoute
 
-#### userRoutes in app.js:
+### userRoutes in app.js:
 	create a basic path for userRoutes
   ``` js
 	app.use("api/v1/user", userRoutes)
   ```
 
-#### FrontEnd:
+### FrontEnd:
     NavBar, other components like register, login, logout, etc
 
 ## Explanation of asyncHandler util
