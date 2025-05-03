@@ -8,17 +8,17 @@
 ### User Schema
  	  username, email, fullName, phone, address, refreshToken, role, password, avatarPhoto, coverPhoto
 
-* if password is modified in user's credentials, then we need to hash the password again, for this we use `userSchame.pre()` method, which takes "save" as first argument and a callback function as second argument,
-    In callback `async function(next)`, we first check if password is modified or not, if not, then return with passing execution to `next()`, if there has been a change in the password, then we need to hash it using bcrypt.
+* if password is modified in user's credentials, then we need to hash the password again, for this we use `userSchame.pre()` or `userSchame.pre(methodName, options, callback)` method, which takes `methodName = (save, or remove, or update, etc.)` as first argument and a callback function as second argument,
+    In callback `async function(next)`, we first check if password is modified or not, if not, then return with passing execution to `next()`, if there has been a change in the password, then we need to hash it using `bcrypt.hash()` and then pass execution to `next()`,
 
 * `userSchema.methods.isPasswordSame`
-* `userSchema.methods.generateAccessToken`
-* `userSchema.methods.generateRefreshToken` 
+* `userSchema.methods.generateAccessToken` using `jwt.sign(payload, secretToken from process.env.ACCESS_TOKEN_SECRET, {expiresIn: process.env.ACCESS_TOKEN_EXPIRY })` -Payload in this case has everything but password and refreshToken
+* `userSchema.methods.generateRefreshToken` using the same method as above but this time the payload carries not much information except `_id:this._id` where this refers to current user.
 
 ### Utils:
     passwordHashingFunction, passwordComaprison, using bcrypt
 
-### UserControllers (Basic User cControllers):
+### UserControllers (Basic User Controllers):
 	registerUser, loginUser, logoutUser, updateAvatar, updateCover, updatePassword, 	passwordReset, 
 
 	later on addition:
@@ -26,9 +26,18 @@
 	userOrders, userProducts etc
 
 ### Middlerwares (pass the execution context to next):
-	authMiddleware on the basis of `JWT` token generation, if user's current access token (`headers.authorization`) matches with the token stored in db, then we'll let the user accessing certain routes, it is primarily for logoutRoute, updateAvatar, Cover, passwrod middlewares
+  - `multer.middleware.js` to catre file uploading to local machine, like avatar, coverPhoto, etc.. Note: This middleware will be used wherever we need to upload some file, for example in userRoutes, as could be seen in following code snippest:
+  ```js
+  router.route("/register").post(upload.fields([
+        // since we are uploading two objects here, cover image and avatar
+        // that's why we need two object
+        {name: "avatar", maxCount: 1},
+        {name: "coverImage", maxCount: 1}
+    ]), registerUser);
+  ```
+	- `auth.middleware.js` on the basis of `JWT` token generation, if user's current access token (`headers.authorization`) matches with the token stored in db, then we'll let the user accessing certain routes, it is primarily for logoutRoute, updateAvatar, Cover, passwrod middlewares.
 
-if accessToken does not match the token in db, we'll grant the user with a refreshToken
+if `accessToken` does not match the token in db, we'll grant the user with a refreshToken
 
 ### UserRoutes:
 	registerUserRoute, loginRoute, logoutRoute, passwordResetRoute
