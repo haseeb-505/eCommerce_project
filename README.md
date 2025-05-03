@@ -6,7 +6,14 @@
     PORT, MONOGODB_URI, JWT_ACCESS_TOKEN, JWT_REFRESH_TOKEN,
 
 ### User Schema
- 	  username, email, fullName, phone, address,    role, password, avatarPhoto, coverPhoto
+ 	  username, email, fullName, phone, address, refreshToken, role, password, avatarPhoto, coverPhoto
+
+* if password is modified in user's credentials, then we need to hash the password again, for this we use `userSchame.pre()` method, which takes "save" as first argument and a callback function as second argument,
+    In callback `async function(next)`, we first check if password is modified or not, if not, then return with passing execution to `next()`, if there has been a change in the password, then we need to hash it using bcrypt.
+
+* `userSchema.methods.isPasswordSame`
+* `userSchema.methods.generateAccessToken`
+* `userSchema.methods.generateRefreshToken` 
 
 ### Utils:
     passwordHashingFunction, passwordComaprison, using bcrypt
