@@ -6,9 +6,9 @@ import cors from "cors";
 const app = express();
 
 // cors middleware
-app.use(cors({
-    origin:  "http://localhost:5173",
-    credentials: true,
+app.use( cors({
+    origin: process.env.CORS_ORGING,
+    credentials: true
 }));
 
 // data handling
@@ -22,5 +22,17 @@ app.use(express.static("public"));
 
 // cookierParser
 app.use(cookieParser());
+
+// routes import
+import userRoutes from "./routes/user.routes.js";
+
+
+// routes path declaration
+app.use("/api/v1/users", userRoutes);
+
+// Default route for testing
+app.get("/", (req, res) => {
+    res.send("<h1>API is running successfully 🚀</h1>");
+});
 
 export { app };
