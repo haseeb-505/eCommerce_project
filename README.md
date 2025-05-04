@@ -17,9 +17,39 @@
 
 ### Utils:
     passwordHashingFunction, passwordComaprison, using bcrypt
+    - `uploadToCloudinary()` function for uploading the files to cloudinary.
 
 ### UserControllers (Basic User Controllers):
-	registerUser, loginUser, logoutUser, updateAvatar, updateCover, updatePassword, 	passwordReset, 
+	#### registerUser
+    - get user details from frontend
+    - validation whether username or email is empty, 
+    - or email is in correct format
+    - check  if user already exists (unique email and username)
+    - check for images
+    - check for avatar
+    - upload to cloudinary
+    - check for avatar on cloudinary
+    - create user object - create entry in db
+    - remove password and refresh token field from response
+    - check for user creation
+    - return response
+  
+  #### loginUser
+    - req body -> data(username, email, password, etc)
+    - username or email,
+    - check if username or email is registered in your db (find the user)
+    - check password and check if password is correct (use user.isPasswordSame())
+    - generate access token and refresh token
+    - send token to secure cookies
+  #### generateAccessRefreshToken function to generate refresh and access token, takes userId as parameter
+    - finder the user with this id,
+    - generate the access and refresh token spearately using current user's method, i.e., `user.generateAccessToken` and `user.generateRefreshToken`
+    - save the newly generted refresh token against current user's refreshToekn using `user.refreshToken = refreshToken`
+    - save the user but validate it before saving, use `user.save({ validateBeforeSaving: true })`
+    - return { accessToken, refreshToken }
+    - send token to secure cookies with httpOnly and secure options
+    - send the response with user object and accessToken
+  logoutUser, updateAvatar, updateCover, updatePassword, 	passwordReset, 
 
 	later on addition:
 
