@@ -67,34 +67,31 @@
     - send the response with options `httpOnly` and `secure`
     - send the clearcookies with response
     - since we don't need to send `accessToken` and `refreshToken` so we make cookies as follows
-      ```js
-          return res.status(200)
-            .learCookie("accessToken", options)
-            .clearCookie("refreshToken", options)
-            .json(
-              new ApiResponse(200, null, "User logged out successfully")
-            )
-      ```
-    
-    
-    
-    `For Example` 
-    ```js
-    findByIdAndUpdate(req.user._id,
-    update={
-      $set: {
-        refreshToken: undefined
-      }
-    },
-    {
-      new: true
-    })
-    ```
+
+  `For Example` 
+  ```js
+  findByIdAndUpdate(req.user._id,
+  update={
+    $set: {
+      refreshToken: undefined
+    }
+  },
+  {
+    new: true
+  })
+  return res.status(200)
+      .learCookie("accessToken", options)
+      .clearCookie("refreshToken", options)
+      .json(
+        new ApiResponse(200, null, "User logged out successfully")
+      )
+  ```
     - options: (Optional) An object specifying options such as new, upsert, runValidators, etc.
 
       - new: If set to true, returns the modified document rather than the original. Defaults to false.
       - upsert: If true, creates the document if it doesn’t exist. Defaults to false.
       - runValidators: If true, runs schema validation during the update. Defaults to false.
+  
   #### updateAvatar, 
   #### updateCover, 
   #### updatePassword, 	
