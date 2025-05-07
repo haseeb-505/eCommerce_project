@@ -1,147 +1,125 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axiosApi from "../utils/AxiosApi.js";
+import { toast, ToastContainer } from "react-toastify";
 
 const Products = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const products = [
-        {
-          id: 1,
-          title: "Mountain Explorer Backpack",
-          description: "Durable 50L backpack with waterproof coating, perfect for hiking and outdoor adventures.",
-          tags: ["#hiking", "#outdoor", "#travel"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "123"
-        },
-        {
-          id: 2,
-          title: "Wireless Noise-Canceling Headphones",
-          description: "Premium sound quality with 30-hour battery life and comfortable over-ear design.",
-          tags: ["#audio", "#tech", "#music"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "1234"
-        
-        },
-        {
-          id: 3,
-          title: "Stainless Steel Water Bottle",
-          description: "Insulated 1L bottle keeps drinks cold for 24 hours or hot for 12 hours.",
-          tags: ["#eco", "#fitness", "#hydration"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "123"
-        },
-        {
-          id: 4,
-          title: "Organic Cotton T-Shirt",
-          description: "Soft, breathable t-shirt made from 100% organic cotton with minimalist design.",
-          tags: ["#fashion", "#sustainable", "#casual"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "12345"
-        },
-        {
-          id: 5,
-          title: "Smart Fitness Watch",
-          description: "Track your heart rate, steps, sleep patterns, and receive smartphone notifications.",
-          tags: ["#fitness", "#tech", "#health"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "123"
-        },
-        {
-          id: 6,
-          title: "Handmade Ceramic Mug",
-          description: "Artisan-crafted mug with unique glaze patterns, microwave and dishwasher safe.",
-          tags: ["#home", "#artisan", "#coffee"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "1234"
-        },
-        {
-          id: 7,
-          title: "Compact Bluetooth Speaker",
-          description: "Portable speaker with 15W output, waterproof design, and 10-hour playtime.",
-          tags: ["#audio", "#portable", "#outdoor"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "123"
-        },
-        {
-          id: 8,
-          title: "Leather Notebook Cover",
-          description: "Genuine leather cover with refillable notebook insert and pen holder.",
-          tags: ["#stationery", "#office", "#gift"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "1234"
-        },
-        {
-          id: 9,
-          title: "Yoga Mat with Carry Strap",
-          description: "Non-slip, eco-friendly mat with 5mm thickness for maximum comfort.",
-          tags: ["#fitness", "#yoga", "#wellness"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "12345"
-        },
-        {
-          id: 10,
-          title: "Reusable Silicone Food Bags",
-          description: "Set of 5 leak-proof bags for food storage, freezer-safe and dishwasher safe.",
-          tags: ["#kitchen", "#eco", "#storage"],
-          image: "./images/card-top.jpg",
-          price: '10',
-          category: "1234"
-        }
-      ];
+  const getProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosApi.get("/products/all-products");
+      if (response.data.success) {
+        setProducts(response.data.data);
+        console.log("Productes fetched successfully!!", response.data.data);
+        toast.success("Productes fetched successfully!!");
+        setLoading(false);
+      } else {
+        console.error("Error submitting form data:", response.data.message);
+        const errorMessage = response.data.message || "Product fetching failed";
+        toast.error(errorMessage);
+      }
+    } catch (error) {
+      if (error.response) {
+        toast.error(
+          error.response.data.message ||
+            error.response.data.error ||
+            "Product fetching failes"
+        );
+      } else if (error.request) {
+        // Request was made but no response received
+        toast.error("No response from server. Please try again.");
+      } else if (error.request) {
+        toast.error("No response from server. Please try again.");
+      } else {
+        console.log("An Unexpected error occured: ", error);
+        toast.error("An unexpected error occurred. ", error);
+      }
+    } finally {
+      setLoading(false)
+    }
+  };
+
+  useEffect(() => {
+    getProducts()
+  }, []);
 
   return (
     <div className="bg-slate-700 flex flex-col m-5">
+      {loading && (
+        <div className="text-white text-2xl">Loading products...</div>
+      )}
+      {products.length === 0 && (
+        <div className="text-white text-2xl">No products found</div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-            <div key={product.id} className="rounded overflow-hidden shadow-lg border-white border-2 shadow-white hover:shadow-xl hover:shadow-blue-500/50 transition-shadow duration-300">
-                <img 
-                className="w-full h-48 object-cover" 
-                src={product.image} 
-                alt={product.title || ""} 
-                />
-                <div className="px-6 pt-4">
-                    <div className="font-bold text-xl mb-2 text-white">
-                        {product.title}
-                    </div>
-                    <p className="text-gray-100 text-base">
-                        {product.description}
-                    </p>
-                    <div className="flex flex-row justify-between md:gap-4 lg:justify-between font-bold text-base mt-2">
-                        <div className="py-1 px-2 w-fit bg-gray-100 rounded-b-md text-gray-700">
-                            Category: {product.category}
-                        </div>
-                        <div className="py-1 px-2 w-fit bg-gray-100 rounded-b-md text-gray-700">
-                            Price: ${product.price}
-                        </div>
-                    </div>
-                      
-                    <div className="px-6 pt-4 pb-2">
-                        {product.tags.map((tag, index) => (
-                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                            {tag}
-                          </span>
-                        ))}
-                    </div>
-                    {/* Add to cart option */}
-                    <div className="px-6 pt-4 pb-2 text-center">
-                        <button 
-                        type="button"
-                        className="bg-blue-600 font-medium rounded-lg p-2 hover:cursor-pointer hover:bg-blue-400 hover:text-black"
-                        >
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
+          <div
+            key={product._id || product.id}
+            className="rounded overflow-hidden shadow-lg border-white border-2 shadow-white hover:shadow-xl hover:shadow-blue-500/50 transition-shadow duration-300"
+          >
+            <div className="relative w-full h-48 rounded-t-md overflow-hidden">
+              <img
+                className="w-full h-full object-contain"
+                src={product.productImage}
+                alt={product.title}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/placeholder-product.jpg";
+                }}
+              />
             </div>
-        ))};
+
+            <div className="px-6 pt-1">
+              <div className="font-bold text-xl mb-2 text-center text-white">
+                {product.title}
+              </div>
+              <p className="text-gray-100 text-base">{product.description}</p>
+              <div className="flex flex-row justify-between md:gap-4 lg:justify-between font-bold text-base mt-2">
+                <div className="py-1 px-2 w-fit bg-gray-100 rounded-b-md text-gray-700">
+                  Category: {product.category}
+                </div>
+                <div className="py-1 px-2 w-fit bg-gray-100 rounded-b-md text-gray-700">
+                  Price: ${product.price}
+                </div>
+              </div>
+              {/* discount and price after discount */}
+              <div className="flex flex-row justify-between md:gap-4 lg:justify-between font-medium text-base mt-2">
+                <div className="py-1 px-2 w-fit bg-green-300 rounded-b-md text-gray-700">
+                  Off: {product.discount}%
+                </div>
+                <div className="py-1 px-2 w-fit bg-green-100 rounded-b-md text-gray-700">
+                  Off Price: $
+                  {product.price - (product.price * product.discount) / 100}
+                </div>
+              </div>
+
+              {/* Add to cart option */}
+              <div className="px-6 pt-4 pb-2 text-center">
+                <button
+                  type="button"
+                  className="bg-blue-600 font-medium rounded-lg p-2 hover:cursor-pointer hover:bg-blue-400 hover:text-black"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 };
