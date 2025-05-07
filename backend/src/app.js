@@ -25,10 +25,12 @@ app.use(cookieParser());
 
 // routes import
 import userRoutes from "./routes/user.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 
 // routes path declaration
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/products", productRoutes);
 
 // Default route for testing
 app.get("/", (req, res) => {

@@ -1,4 +1,4 @@
-import { Product } from "../models/product.models";
+import { Product } from "../models/product.models.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import asyncHandler from "../utils/asyncHandlers.js";
 import { ApiError } from "../utils/ApiError.js";

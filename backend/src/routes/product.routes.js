@@ -4,7 +4,8 @@ import {
     getProductByTitle, 
     getProductsByTags, 
     getProductsByCategory, 
-    deleteProductByTitle
+    deleteProductById,
+    updateProduct,
 } from "../controller/product.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -24,14 +25,14 @@ router.route("/create-products").post(
 router.route("/product-by-title").get(getProductByTitle);
 router.route("/products-by-tags").get(getProductsByTags);
 router.route("/products-by-category").get(getProductsByCategory);
-router.route("/delete-product").put(upload.fields(
+router.route("/update-product").put(verifyJWT, upload.fields(
     {
         name: "productImage",
         maxCount: 1,
     }
-), deleteProductByTitle);
-router.route("/delete-product").delete(deleteProductByTitle);
+), updateProduct);
+router.route("/delete-product").delete(verifyJWT, deleteProductById);
 
 
-
+export default router;
 
