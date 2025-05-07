@@ -1,12 +1,10 @@
-import User from "../models/user.model.js";
+import {User} from "../models/user.models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asyncHandlers.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { response } from "express";
-
 
 const generateAccessRefreshToken = async (userId) => {
     try {
@@ -42,27 +40,50 @@ const registerUser = asyncHandler( async (req, res) => {
     // return response
     
     const {username, email, password, fullName, phone, address, role} = req.body;
-    if ([username, email, password, fullName].some((field) => field.trim==="")) {
-        return new ApiResponse(res, 400, false, "All field are required");
-    }
+
+    if ([username, email, password, fullName].some((field) => field.trim()==="")) {
+        return res.status(400).json(
+            new ApiResponse(400, null, "All field are required")
+        )
+    };
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        return new ApiResponse(res, 400, false, "Email is not valid");
-    }
+        return res.json(400).json(
+             new ApiResponse(400, null, "Email is not valid")
+        )
+    };
 
-    const userExists = await User.findOne({$or: [{username}, {email}]});
-    if (userExists) {
-        return new ApiResponse(res, 400, false, "User with same email or username already exists")
-    }
+    const usernameExists = await User.findOne({username: username});
+    if (usernameExists) {
+        return res.status(400).json(
+             new ApiResponse(400, null, "User with same username already exists")
+        )
+    };
+
+    const emailExists = await User.findOne({email: email});
+    if (emailExists) {
+        return res.status(400).json(
+             new ApiResponse(400, null, "User with same email already exists")
+        )
+    };
+    const phoneExists = await User.findOne({phone: phone});
+    if (phoneExists) {
+        return res.status(400).json(
+             new ApiResponse(400, null, "User with same phone already exists")
+        )
+    };
 
     const avatarLocalFile = req.files?.avatar[0]?.path;
     let coverPhotoLocalFile = req.files?.coverPhoto[0]?.path;
 
     // since only avatar is mendatory, so we check for avatar file only
     if (!avatarLocalFile) {
-        return new ApiResponse(res, 400, false, "Avater is required")
-    }
+        return res.status(400).json(
+            new ApiResponse(400, null, "Avater is required")
+        )
+    };
+
 
     // upload the files to cloudinary
     const avatar = await uploadToCloudinary(avatarLocalFile);
@@ -70,8 +91,10 @@ const registerUser = asyncHandler( async (req, res) => {
 
     // if upload fails,
     if (!avatar) {
-        return new ApiResponse(res, 500, false, "Error uploading files to cloudinary")
-    }
+        return res.status(500).json( 
+            new ApiResponse(500, null, "Error uploading files to cloudinary")
+        )
+    };
 
     // create the user object
     const user = await User.create({
@@ -88,15 +111,17 @@ const registerUser = asyncHandler( async (req, res) => {
 
     // check if user is created successfully
     if (!user) {
-        return new ApiResponse(res, 500, false, "Error creating user")
-    }
+        return res.status(500).json( 
+            new ApiResponse(500, null, "Error creating user")
+        )
+    };
 
     // user is created successfully and now we have to send this user in response, so we need to remove  the password and refreshToken
     const createdUser = await User.findById(user._id).select("-password -refreshToken")
 
     // return the response
     return res.status(201).json(
-        new ApiResponse(res, 201, true, "User created successfully!!!")
+        new ApiResponse(201, createdUser, "User created successfully!!!")
     )
 });
 
@@ -112,32 +137,44 @@ const loginUser = asyncHandler(async (req, res) => {
     //  send the response with user object and accessToken
 
     const { username, email, password } = req.body;
+    console.log(username, email, password);
+
     if (!username && !email) {
-        return new ApiResponse( res, 400, false, "username or email is required");
+        return res.status(400).json( 
+            new ApiResponse(400, null, "username or email is required")
+        )
     };
 
     if (!password) {
-        return new ApiResponse( res, 400, false, "password is required")
-    }
+        return res.status(400).json( 
+            new ApiResponse(400, null, "password is required")
+        )
+    };
 
     // find the user in db
     // make sure to recieve only one these, username or email
     const user = await User.findOne({ $or: [{ username }, { email}]});
     if (!user) {
-        return new ApiResponse( res, 400, false, "No user found with this username or email");
-    }
+        return res.status(400).json( 
+            new ApiResponse(400, null, "No user found with this username or email")
+        )
+    };
 
     // check if password is correct
     const isPasswordSame = await user.isPasswordSame(password);
     if (!isPasswordSame) {
-        return new ApiResponse( res, 400, false, "password is invalid")
-    }
+        return res.status(400).json( 
+            new ApiResponse(400, null, "password is invalid")
+        )
+    };
 
     // generate accessToken and refreshToken
     const { accessToken, refreshToken } = await generateAccessRefreshToken(user._id);
     if (!accessToken || !refreshToken) {
-        return new ApiResponse(res, 500, false, "Error generating access and refresh toekns");
-    }
+        return res.status(400).json( 
+            new ApiResponse(500, null, "Error generating access and refresh toekns")
+        )
+    };
 
     // remove password and refreshToken from user object of send user in response
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
@@ -192,6 +229,10 @@ const logoutUser = asyncHandler(async (req, res) => {
             new ApiResponse(200, null, "User logged out successfully")
         )
 });
+
+// update a user 
+
+// get all products by certain user
 
 
 

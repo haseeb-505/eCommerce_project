@@ -7,7 +7,7 @@ const app = express();
 
 // cors middleware
 app.use( cors({
-    origin: process.env.CORS_ORGING,
+    origin: process.env.CORS_ORIGIN,
     credentials: true
 }));
 
@@ -32,6 +32,7 @@ app.use("/api/v1/users", userRoutes);
 
 // Default route for testing
 app.get("/", (req, res) => {
+    console.log(`App is running on port:${process.env.PORT}\n http:localhost:${process.env.PORT}` )
     res.send("<h1>API is running successfully 🚀</h1>");
 });
 

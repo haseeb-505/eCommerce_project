@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrpyt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import ApiError from '../utils/ApiError.js';
+import {ApiError} from '../utils/ApiError.js';
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -64,7 +64,7 @@ userSchema.pre("save", async function(next){
     if(!this.isModified("password")){
         return next();
     }
-    this.password = await bcrpyt.hash(this.password, saltOrRounds=10);
+    this.password = await bcrpyt.hash(this.password, 10);
     next();
 });
 
