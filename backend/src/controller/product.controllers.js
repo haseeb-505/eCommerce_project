@@ -22,10 +22,13 @@ const createProduct = asyncHandler( async(req, res) => {
     const titleExists = await Product.findOne({title: title});
     if (titleExists) {
         console.log("Title needs to be unique");
+        return res.status(400).json(
+            new ApiResponse(400, null, "Title needs to be unique")
+        )
     }
 
     // get the productImage via req.files
-    const productImageLocalFile = req.files.productImage[0]?.path;
+    const productImageLocalFile = req.files?.productImage?.[0].path;
     if (!productImageLocalFile) {
         console.log("Avatar is required")
         return res.status(400).json(
@@ -34,7 +37,7 @@ const createProduct = asyncHandler( async(req, res) => {
     }
 
     // upload the productImage to cloudinary
-    const productImage = await uploadToCloudinary(productImage);
+    const productImage = await uploadToCloudinary(productImageLocalFile );
 
     if (!productImage) {
         console.log("Server error, ProductImage could not be uploaded to cloudinary")
@@ -64,8 +67,27 @@ const createProduct = asyncHandler( async(req, res) => {
 
     // return the response
     return res.status(201).json(
-        new ApiResponse(201, createdUser, "Product created successfully!!!")
+        new ApiResponse(201, product, "Product created successfully!!!")
     )
+});
+
+// get all products
+const getAllProducts = asyncHandler(async (req, res) => {
+    try {
+        // Fetch all products from the database
+        const products = await Product.find({});
+        
+        // Return the products
+        return res.status(200).json(
+            new ApiResponse(200, products, "All products fetched successfully")
+        );
+        
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json(
+            new ApiResponse(500, null, "Error fetching products")
+        );
+    }
 });
 
 // get product by title
@@ -103,6 +125,23 @@ const getProductsByTags = asyncHandler(async (req, res) => {
     return res.status(200).json(
         new ApiResponse(200, products, "Success")
     )
+});
+
+// get all the categories
+const getAllCategories = asyncHandler(async (req, res) => {
+    try {
+        const products = await Product.find({});
+        const categories = [... new Set(products.map((p) => p.category))];
+
+        return res.status(200).json(
+            new ApiResponse(200, categories, "Success")
+        )
+    } catch (error) {
+        console.log("Error fetching categories: ", error)
+        return res.status(500).json(
+            new ApiResponse(500, null, "Error fetching categories")
+        )
+    }
 });
 
 const getProductsByCategory = asyncHandler(async (req, res) => {
@@ -199,8 +238,10 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 
 export { 
-    createProduct, 
-    getProductByTitle, 
+    createProduct,
+    getAllProducts, 
+    getProductByTitle,
+    getAllCategories, 
     getProductsByTags, 
     getProductsByCategory, 
     deleteProductById,

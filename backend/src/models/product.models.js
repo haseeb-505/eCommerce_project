@@ -27,17 +27,13 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
         trim: true,
+        default: 0
     },
     productImage: {
         type: String,
         required: true,
         trim: true,
     },
-    tags: [{
-        type: String,
-        lowercase: true,
-        trim: true,
-    }],
     category: {
         type: String,
         required: true,
