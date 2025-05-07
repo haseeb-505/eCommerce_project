@@ -9,6 +9,7 @@ const Products = () => {
           description: "Durable 50L backpack with waterproof coating, perfect for hiking and outdoor adventures.",
           tags: ["#hiking", "#outdoor", "#travel"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "123"
         },
         {
@@ -17,6 +18,7 @@ const Products = () => {
           description: "Premium sound quality with 30-hour battery life and comfortable over-ear design.",
           tags: ["#audio", "#tech", "#music"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "1234"
         
         },
@@ -26,6 +28,7 @@ const Products = () => {
           description: "Insulated 1L bottle keeps drinks cold for 24 hours or hot for 12 hours.",
           tags: ["#eco", "#fitness", "#hydration"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "123"
         },
         {
@@ -34,6 +37,7 @@ const Products = () => {
           description: "Soft, breathable t-shirt made from 100% organic cotton with minimalist design.",
           tags: ["#fashion", "#sustainable", "#casual"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "12345"
         },
         {
@@ -42,6 +46,7 @@ const Products = () => {
           description: "Track your heart rate, steps, sleep patterns, and receive smartphone notifications.",
           tags: ["#fitness", "#tech", "#health"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "123"
         },
         {
@@ -50,6 +55,7 @@ const Products = () => {
           description: "Artisan-crafted mug with unique glaze patterns, microwave and dishwasher safe.",
           tags: ["#home", "#artisan", "#coffee"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "1234"
         },
         {
@@ -58,6 +64,7 @@ const Products = () => {
           description: "Portable speaker with 15W output, waterproof design, and 10-hour playtime.",
           tags: ["#audio", "#portable", "#outdoor"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "123"
         },
         {
@@ -66,6 +73,7 @@ const Products = () => {
           description: "Genuine leather cover with refillable notebook insert and pen holder.",
           tags: ["#stationery", "#office", "#gift"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "1234"
         },
         {
@@ -74,6 +82,7 @@ const Products = () => {
           description: "Non-slip, eco-friendly mat with 5mm thickness for maximum comfort.",
           tags: ["#fitness", "#yoga", "#wellness"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "12345"
         },
         {
@@ -82,6 +91,7 @@ const Products = () => {
           description: "Set of 5 leak-proof bags for food storage, freezer-safe and dishwasher safe.",
           tags: ["#kitchen", "#eco", "#storage"],
           image: "./images/card-top.jpg",
+          price: '10',
           category: "1234"
         }
       ];
@@ -103,13 +113,18 @@ const Products = () => {
                     <p className="text-gray-100 text-base">
                         {product.description}
                     </p>
-                    <div className="font-bold text-base mt-2 py-1 px-2 w-fit bg-gray-100 rounded-b-md text-gray-700">
-                        Category: {product.category}
+                    <div className="flex flex-row justify-between md:gap-4 lg:justify-between font-bold text-base mt-2">
+                        <div className="py-1 px-2 w-fit bg-gray-100 rounded-b-md text-gray-700">
+                            Category: {product.category}
+                        </div>
+                        <div className="py-1 px-2 w-fit bg-gray-100 rounded-b-md text-gray-700">
+                            Price: ${product.price}
+                        </div>
                     </div>
-                    
+                      
                     <div className="px-6 pt-4 pb-2">
                         {product.tags.map((tag, index) => (
-                            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                             {tag}
                           </span>
                         ))}
