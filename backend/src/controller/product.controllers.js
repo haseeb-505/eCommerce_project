@@ -145,15 +145,20 @@ const getAllCategories = asyncHandler(async (req, res) => {
 });
 
 const getProductsByCategory = asyncHandler(async (req, res) => {
-    const { category } = req.query;
-    if (!category) {
-        throw new ApiError(400, "No category passed")
+    const { categories } = req.body;
+
+    if (!Array.isArray(categories)) {
+        throw new ApiError(400, "No category array passed")
     }
 
-    const products = await Product.find({ category: category.trim()})
-    if (!products || products.length === 0) {
-        throw new ApiError(403, "No product found for these categories")
-    }
+    // converting categories array items to lowercase as data in db is in lowercase
+    const categoriesLower = categories.map((category) => category.toLowerCase());
+
+    const products = await Product.find({
+        category: {
+            $in: categoriesLower
+        }
+    })
 
     return res.status(200).json(
         new ApiResponse(200, products, "Success")
