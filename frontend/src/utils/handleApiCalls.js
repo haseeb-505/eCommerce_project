@@ -8,7 +8,7 @@ const handleApiCall = async (apiFn, onSuccess, setLoading) => {
 
         if (response.data.success) {
             onSuccess(response.data.data);
-            toast.success("Data fetchend successfully!!");
+            // toast.success("Data fetchend successfully!!");
         } else {
             toast.error(response.data.message || "Something went wrong")
         }
