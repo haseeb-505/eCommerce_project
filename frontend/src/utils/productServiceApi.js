@@ -17,7 +17,7 @@ const handleApiCall = async (apiFn, onSuccess, setLoading) => {
 
         if (response.data.success) {
             onSuccess(response.data.data);
-            toast.success("Data fetchend successfully!!");
+            // toast.success("Data fetchend successfully!!");
         } else {
             toast.error(response.data.message || "Something went wrong")
         }
@@ -42,6 +42,30 @@ export const fetchAllProducts = (onSuccess, setLoading) => (
 export const fetchCategories = (onSuccess, setLoading) => (
     handleApiCall(() => axiosApi.get("/products/products-category"), onSuccess, setLoading)
 );
+
+
+export const getProductsByCategories = (
+    selectedCategories,
+    setFilteredProducts,
+    setLoading,
+    setFiltering
+  ) => {
+    return handleApiCall(
+      () =>
+        axiosApi.post(
+          "/products/products-by-categories",
+          { categories: selectedCategories },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            }
+          }
+        ),
+      setFilteredProducts,
+      setLoading,
+      setFiltering(true)
+    );
+  };
 
 // what is confusing here is the onSuccess call back function, 
 // because setLoading callback is kind of clear that it will update some loading state
