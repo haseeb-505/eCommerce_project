@@ -1,84 +1,26 @@
 import React, { useEffect, useState } from "react";
 import axiosApi from "../utils/AxiosApi.js";
+import { fetchAllProducts, fetchCategories } from "../utils/productServiceApi.js";
 import { toast, ToastContainer } from "react-toastify";
 
 const Category = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
-  const getCategories = async () => {
-    try {
-      setLoading(true);
-
-      const response = await axiosApi.get("/products/products-category");
-      if (response.data.success) {
-        setCategories(response.data.data);
-        setLoading(false);
-      } else {
-        console.error("Error submitting form data:", response.data.message);
-        const errorMessage = response.data.message || "Product fetching failed";
-        toast.error(errorMessage);
-      }
-    } catch (error) {
-      if (error.response) {
-        toast.error(
-          error.response.data.message ||
-            error.response.data.error ||
-            "Categories fetching failes"
-        );
-      } else if (error.request) {
-        // Request was made but no response received
-        toast.error("No response from server. Please try again.");
-      } else if (error.request) {
-        toast.error("No response from server. Please try again.");
-      } else {
-        console.log("An Unexpected error occured: ", error);
-        toast.error("An unexpected error occurred. ", error);
-      }
-    }
-  };
-
-  const getProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosApi.get("/products/all-products");
-      if (response.data.success) {
-        setProducts(response.data.data);
-        console.log("Productes fetched successfully!!", response.data.data);
-        console.log("Productes fetched successfully with type!!", typeof(response.data.data));
-        toast.success("Productes fetched successfully!!");
-        setLoading(false);
-      } else {
-        console.error("Error fetching categories:", response.data.message);
-        const errorMessage = response.data.message || "Product fetching failed";
-        toast.error(errorMessage);
-      }
-    } catch (error) {
-      if (error.response) {
-        toast.error(
-          error.response.data.message ||
-            error.response.data.error ||
-            "Product fetching failes"
-        );
-      } else if (error.request) {
-        // Request was made but no response received
-        toast.error("No response from server. Please try again.");
-      } else if (error.request) {
-        toast.error("No response from server. Please try again.");
-      } else {
-        console.log("An Unexpected error occured: ", error);
-        toast.error("An unexpected error occurred. ", error);
-      }
-    } finally {
-      setLoading(false)
-    }
+  // handleCheckboxChange
+  const handleCheckboxChange = (category) => {
+    setSelectedCategories((prevSelected) => {
+      return prevSelected.includes(category) ? prevSelected.filter((alreadySelectedCat) => alreadySelectedCat !== category) : [...prevSelected, category]
+    })
   };
 
   useEffect(() => {
-    getCategories();
-    getProducts();
-  }, []);
+    fetchCategories(setCategories, setLoading);
+    fetchAllProducts(setProducts, setLoading);
+    // rerender/ or remount the component when selectedCategories change
+  }, [selectedCategories]);
 
   return (
     <div className="pt-20 bg-slate-700">
@@ -90,6 +32,7 @@ const Category = () => {
               <input
                 type="checkbox"
                 value={category}
+                checked={selectedCategories.includes(category)}
                 onChange={() => handleCheckboxChange(category)}
                 className="form-checkbox h-4 w-4 text-blue-600"
               />
