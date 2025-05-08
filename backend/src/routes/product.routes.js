@@ -28,7 +28,7 @@ router.route("/all-products").get(getAllProducts);
 router.route("/product-by-title").get(getProductByTitle);
 router.route("/products-category").get(getAllCategories);
 router.route("/products-by-tags").get(getProductsByTags);
-router.route("/products-by-category").get(getProductsByCategory);
+router.route("/products-by-categories").post(getProductsByCategory);
 router.route("/update-product").put(verifyJWT, upload.fields(
     [{
         name: "productImage",
