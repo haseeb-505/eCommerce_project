@@ -4,12 +4,17 @@ import Footer from './Footer';
 
 const Layout = () => {
   return (
-    <div className='bg-slate-900 text-white'>
+    <div className='bg-slate-700 text-white min-h-screen flex flex-col'>
       <NavBar />
-      <Outlet />  {/* This renders the current route's component */}
+      
+      <main className="flex-grow">
+        <Outlet />  {/* This renders the current route's component */}
+      </main>
+      
       <Footer />
     </div>
   );
 };
+
 
 export default Layout;

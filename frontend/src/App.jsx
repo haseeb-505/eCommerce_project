@@ -10,6 +10,7 @@ import Login from './components/Login';
 import Cart from './components/Cart';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import AddProduct from './components/AddProduct.jsx';
+import Profile from './components/Profile.jsx';
 
 function App() {
 
@@ -20,9 +21,10 @@ function App() {
             <Route element={<Layout />}>
               <Route path='/' element={<Home />} />
               <Route path='/add-product' element={<AddProduct />} />
-              <Route path="/category" element={<Category />} />
+              {/* <Route path="/category" element={<Category />} /> */}
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/cart" element={<PrivateRoute><Cart /></PrivateRoute>} />
             </Route>
           </Routes>
