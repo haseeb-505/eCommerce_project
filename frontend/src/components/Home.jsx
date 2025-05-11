@@ -34,7 +34,7 @@ const Home = () => {
   return (
     <div className="pt-13 md:pt-18 lg:pt-13 pb-15 bg-slate-700 min-h-[calc(100vh-120px)]">
       <div className="text-center">
-        <h1 className="text-xl md:text-3xl bg-green-700 font-medium font-serif mb-2 p-1 border-2 border-white rounded-2xl">Categories</h1>
+        <h1 className="text-xl md:text-3xl bg-green-700 font-medium font-serif mb-2 mt-14 sm:mt-14 md:mt-9 lg:mt-14 p-1 border-2 border-white rounded-lg">Categories</h1>
         <div className="flex justify-center flex-wrap gap-4 mb-6 mt-4 bg-red-500 text-black border-2 border-white rounded-2xl">
           {categories.map((category) => (
             <label key={category} className="flex items-center space-x-2 text-black text-lg">

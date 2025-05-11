@@ -7,11 +7,14 @@ import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid";
 import axiosApi from "../utils/AxiosApi.js";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useRegisterUserMutation } from '../redux/authentication/authApi.js'; // update path as needed
+
 
 // Validation schema
 const schema = yup.object().shape({
   username: yup.string().required("Username is required").min(3),
   email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup.string().required("Password is required").min(6, "Password must be at least 6 characters"),
   fullName: yup.string().required("Full name is required"),
   avatar: yup
     .mixed()
@@ -58,12 +61,12 @@ const SignupForm = () => {
 
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [coverPhotoPreview, setCoverPhotoPreview] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [registerUser, { isLoading: isSubmitting}] = useRegisterUserMutation();
 
   const onSubmit = async (data) => {
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
     try {
       // Create FormData for file uploads
       const formData = new FormData();
@@ -77,28 +80,26 @@ const SignupForm = () => {
         }
       });
 
-      //   API call to submit the form data to backend register endpoint
-      const response = await axiosApi.post("users/register", formData);
+      const response = await registerUser(formData).unwrap();
+      // console.log("response is: ", response)
 
-      if (response.data.success) {
-        console.log("Form data submitted successfully:", response.data);
-        toast.success("Signup successful! Redirecting...");
-      // Redirect after success
-        setTimeout(() => navigate('/login'), 2000);
-      } else {
-        console.error("Error submitting form data:", response.data.message);
-        toast.error(response.data.message || "Signup failed");
-      }
+      // Check for success in different possible response structures
+    if (response.success || response.data?.success) {
+      toast.success("Signup successful! Redirecting...");
+      setTimeout(() => navigate('/login'), 2000);
+    } else {
+      const errorMsg = response.message || response.data?.message || "Signup failed";
+      toast.error(errorMsg);
+    }
     } catch (error) {
       if (error.response) {
         toast.error(error.response.data.message || "Signup failes")
       } else if (error.request){
         toast.error("No response from server. Please try again.")
       } else {
+        console.log("An unexpected error occurred. ", error)
         toast.error("An unexpected error occurred. ", error)
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

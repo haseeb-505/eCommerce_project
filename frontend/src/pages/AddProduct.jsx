@@ -132,7 +132,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="pt-20 pb-20 bg-slate-700">
+    <div className="pt-30 pb-20 bg-slate-700">
       <div className="py-10 px-20 max-w-md mx-auto bg-slate-900 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Add Product</h2>
         <form onSubmit={formik.handleSubmit} className="space-y-4">

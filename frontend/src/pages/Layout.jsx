@@ -1,11 +1,13 @@
+import React from 'react';
 import { Outlet } from 'react-router-dom';
-import NavBar from './NavBar';
-import Footer from './Footer';
+import NavigationWrapper from './NavigationWrapper'
+import Footer from '../components/Footer';
 
 const Layout = () => {
+  document.body.style.overscrollBehavior = 'none';
   return (
     <div className='bg-slate-700 text-white min-h-screen flex flex-col'>
-      <NavBar />
+      <NavigationWrapper />
       
       <main className="flex-grow">
         <Outlet />  {/* This renders the current route's component */}
@@ -13,8 +15,7 @@ const Layout = () => {
       
       <Footer />
     </div>
-  );
-};
+  )
+}
 
-
-export default Layout;
+export default Layout
