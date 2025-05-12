@@ -2,28 +2,40 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import NavigationWrapper from './NavigationWrapper';
 import Footer from '../components/Footer';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearUserInfo, setUserInfo } from '../redux/Authentication/authSlice';
+import { clearUserInfo, setUserInfo } from '../redux/authentication/authSlice';
 import { useGetCurrentUserQuery } from "../redux/authentication/authApi.js";
 import { useEffect } from 'react';
 
 const Layout = () => {
   document.body.style.overscrollBehavior = 'none';
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { data, error, isLoading, isFetching } = useGetCurrentUserQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    pollingInterval: 300000 // 5 minute revalidation
+  });
 
-  const { data: responseData, isLoading } = useGetCurrentUserQuery();
-
+  // Sync state with query results
   useEffect(() => {
-    if (responseData?.data) {
-      dispatch(setUserInfo(responseData.data));
+    if (data?.user) {
+      dispatch(setUserInfo({
+        user: data.user,
+        isAuthenticated: true
+      }));
     }
-  }, [responseData, dispatch]);
+  }, [data, dispatch]);
 
-  console.log("Data in layout is: ", responseData?.data);
+  // Immediate error handling
+  useEffect(() => {
+    if (error) {
+      dispatch(clearUserInfo());
+    }
+  }, [error, dispatch]);
+
+  console.log("Data in layout is: ", data);
 
 
   // Show loading state while checking auth
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="min-h-screen flex items-center justify-center text-xl">
         Checking authentication...
