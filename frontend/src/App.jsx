@@ -38,7 +38,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/add-product' element={ isAuthenticated ? <AddProduct /> : <Navigate to="/login" /> } />
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={ !isAuthenticated ? <Login /> : <Navigate to="/profile" /> } />
+          <Route path="/login" element={ <Login />} />
           <Route path="/profile" element={ isAuthenticated ? <Profile /> : <Navigate to="/login" /> } />
           <Route path="/cart" element={ isAuthenticated ? <Cart /> : <Navigate to="/login" /> } />
         </Route>

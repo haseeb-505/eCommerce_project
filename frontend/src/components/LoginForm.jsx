@@ -1,11 +1,13 @@
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from "react-router-dom";
 import { useLoginUserMutation } from "../redux/authentication/authApi.js";
-import { useDispatch } from "react-redux";
-import { setUserInfo } from "../redux/Authentication/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserInfo } from "../redux/authentication/authSlice";
+import authApi from "../redux/authentication/authApi.js";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -17,6 +19,14 @@ const LoginForm = () => {
   } = useForm();
   const dispatch = useDispatch();
   const [loginUser, {isLoading }] = useLoginUserMutation();
+  const { isAuthenticated } = useSelector(state => state.auth)
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/profile');
+    }
+  }, [isAuthenticated, navigate])
+
 
   const onSubmit = async (data) => {
     try {
@@ -25,15 +35,17 @@ const LoginForm = () => {
       if (res.success || res.data.success) {
         // console.log("Login response is: ", res);
         dispatch(setUserInfo({
-          user: res.data.data.user,
-          token: res.data.data.token
-        }))
+          user: res.data?.user || res.data?.data?.user,
+          // token: res.data.data.token,
+          isAuthenticated: true
+        }));
+
         toast.success("Login successful!");
+
         // Redirect to intended page or home
-        const redirectTo = location.state?.from?.pathname || "/";
-        navigate(redirectTo);
+        navigate("/");
       } else {
-        toast.error(response.data.message || "Invalid email or password");
+        toast.error(res.data.message || "Invalid email or password");
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
@@ -57,12 +69,12 @@ const LoginForm = () => {
             })}
             type="text"
             className={`w-full px-4 py-2 rounded-md border bg-slate-700 text-white ${
-              errors.email ? "border-red-500" : "border-slate-600"
+              errors.loginId ? "border-red-500" : "border-slate-600"
             }`}
             placeholder="email or username"
           />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+          {errors.loginId && (
+            <p className="mt-1 text-sm text-red-400">{errors.loginId.message}</p>
           )}
         </div>
 

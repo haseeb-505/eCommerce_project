@@ -12,7 +12,8 @@ const authSlice = createSlice({
             if (!action.payload) {
                 console.error("No payload provided to setUserInfo");
                 return;
-              }
+            }
+            console.log('Dispatching setUserInfo:', action.payload);
 
             const userData = action.payload?.user || action.payload;
         
@@ -23,7 +24,7 @@ const authSlice = createSlice({
             }
 
             state.user = userData;
-            state.isAuthenticated = Boolean(userData);
+            state.isAuthenticated = true;
         },
         
         clearUserInfo: (state, action) => {

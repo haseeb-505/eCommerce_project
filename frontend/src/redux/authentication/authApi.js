@@ -17,65 +17,17 @@ const authApi = createApi({
                 method : 'POST',
                 body : formData,
             }),
-            transformResponse: (response) => {
-                // Standardize the response structure
-                return {
-                  success: true,
-                  data: response,
-                  message: "Registration successful"
-                };
-              },
-              transformErrorResponse: (response) => {
-                // Standardize error responses
-                return {
-                  success: false,
-                  error: response.data?.message || "Registration failed",
-                  status: response.status
-                };
-              }
         }),
         loginUser: build.mutation({
-            query:(formData) => ({
-                url : 'auth/login',
-                method : 'POST',
-                body : formData
-            }),
-            transformResponse: (response) => {
-                // Standardize the response structure
-                return {
-                  success: true,
-                  data: response,
-                  message: "Login successful"
-                };
-              },
-              transformErrorResponse: (response) => {
-                // Standardize error responses
-                return {
-                  success: false,
-                  error: response.data?.message || "Login failed",
-                  status: response.status
-                };
-              }
+          query: (formData) => ({
+            url: 'auth/login',
+            method: 'POST',
+            body: formData,
+          }),
         }),
         getCurrentUser: build.query({
-          query: () => ({
-            url: 'auth/check-auth', 
-            method: 'GET',
-          }),
-          transformResponse: (response) => {
-            return {
-              authenticated: true,
-              user: response.data || null
-            };
-          },
-          transformErrorResponse: (response) => {
-            return {
-              authenticated: false,
-              user: null,
-              error: response.data?.message || "Not authenticated"
-            };
-          },
-        })
+          query: () => 'auth/check-auth',
+        }),
     })
 });
 

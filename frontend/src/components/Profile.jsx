@@ -5,9 +5,6 @@ import { useSelector } from 'react-redux';
 const Profile = () => {
   const { user } = useSelector(state => state.auth);
   const [showFullAvatar, setShowFullAvatar] = useState(false);
-  console.log("User avatar is: ", user.avatar);
-  console.log("User covre is: ", user.coverPhoto);
-
   return (
     <div className="flex flex-col bg-slate-700 min-h-[calc(100vh-120px)]">
       

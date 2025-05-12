@@ -7,7 +7,8 @@ const Header = () => {
     const { user, isAuthenticated } = useSelector((state) => state.auth);
     
     // console.log("User and authentication values are: ", user);
-    // console.log("User and authentication values are: ", isAuthenticated);
+    console.log("User values in header are: ", user);
+    console.log("Authentication in header values are: ", isAuthenticated);
     
     return (
         <header className="bg-gray-900 text-white py-2 px-4">
