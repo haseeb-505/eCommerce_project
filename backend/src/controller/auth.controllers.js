@@ -190,24 +190,27 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     return res.status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, {httpOnly: true, secure: true, maxAge: 1000 * 60 * 60})
+        .cookie("refreshToken", refreshToken, {httpOnly: true, secure: true, maxAge: 1000 * 60 * 60 * 24})
         .json(
-            new ApiResponse(200, { user: loggedInUser, accessToken}, "user loggdIn successfully")
+            new ApiResponse(200, { user: loggedInUser }, "user loggdIn successfully")
         )
 
 });
 
 // check user auth or getCurrentUser
 const getCurrentUser = asyncHandler(async (req, res) => {
-    const id = req.user._id;
+    const id = req.user?._id;
+    console.log("User ID from token:", id);
 
-    const user = await User.findById(id);
+    const user = await User.findById(id).select("-password -accessToken");
+    console.log("Current user is: ", user)
+
 
     return res.status(200).json(
         new ApiResponse(200, user, "user-auth true")
     )
-})
+});
 
 // lgout user
 const logoutUser = asyncHandler(async (req, res) => {
