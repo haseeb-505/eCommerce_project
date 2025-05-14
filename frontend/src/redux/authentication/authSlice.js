@@ -1,39 +1,49 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const authSlice = createSlice({
-    name: 'auth',
-    initialState: {
-        user: null,
-        isAuthenticated: false,
+  name: 'auth',
+  initialState: {
+    user: null,
+    isAuthenticated: false,
+    accessToken: null
+  },
+  reducers: {
+    setUserInfo: (state, action) => {
+      if (!action.payload) {
+        console.error("No payload provided to setUserInfo");
+        return;
+      }
+
+      // console.log("payload is: ", action.payload);
+
+      const { user, accessToken, isAuthenticated } = action.payload;
+
+      if (!user) {
+        console.error("Invalid user in payload");
+        state.error = "Invalid user";
+        return;
+      }
+
+      state.user = user;
+      state.isAuthenticated = isAuthenticated !== undefined ? isAuthenticated : true;
+      state.accessToken = accessToken;
     },
-    reducers:{ // reducers are basically our actions which we want to perform
-        // since reducers are actions, and actions are basically functions
-        setUserInfo: (state, action) => {
-            if (!action.payload) {
-                console.error("No payload provided to setUserInfo");
-                return;
-            }
-            console.log('Dispatching setUserInfo:', action.payload);
-
-            const userData = action.payload?.user || action.payload;
-        
-            if (!userData) {
-                console.error("Invalid user data in payload");
-                state.error = "Invalid user data";
-                return;
-            }
-
-            state.user = userData;
-            state.isAuthenticated = true;
-        },
-        
-        clearUserInfo: (state, action) => {
-            state.user = null
-            state.isAuthenticated = false
-        }
-
+    
+    // setCredentials: (state, action) => {
+    //   const { accessToken } = action.payload;
+    //   state.token = accessToken;
+    // },
+    
+    logOut: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.accessToken = null;
     }
+  }
 });
 
-export const { setUserInfo, clearUserInfo } = authSlice.actions;
+export const { setUserInfo, clearUserInfo, setCredentials, logOut } = authSlice.actions;
 export default authSlice.reducer;
+
+export const selectCurrentToken = (state) => state.auth.token;
+export const selectCurrentUser = (state) => state.auth.user;

@@ -11,40 +11,35 @@ import AddProduct from './pages/AddProduct.jsx';
 import Home from './components/Home.jsx';
 import Category from './components/Category';
 import Cart from './components/Cart.jsx';
-
-
 import Profile from './components/Profile.jsx';
-import { useSelector } from 'react-redux';
-
+import PersistLogin from './components/PersistLogin'; // Import the PersistLogin component
+import RequireAuth from './components/RequireAuth'; // We'll create this
 
 function App() {
-
-  const { isAuthenticated, isLoading }= useSelector((state => state.auth))
-  // console.log("is authenticated has following info: ", isAuthenticated)
-
-  if (isLoading) {
-    return (
-      <div className="bg-slate-900 text-white min-h-screen flex items-center justify-center">
-        <div className="text-2xl">Loading authentication status...</div>
-      </div>
-    );
-  }
-
+  // We can remove the isLoading check from here since PersistLogin will handle it
   return (
     <div className='bg-slate-900 text-white'>
-
       <Routes>
         <Route element={<Layout />}>
+          {/* Public routes */}
           <Route path='/' element={<Home />} />
-          <Route path='/add-product' element={ isAuthenticated ? <AddProduct /> : <Navigate to="/login" /> } />
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={ <Login />} />
-          <Route path="/profile" element={ isAuthenticated ? <Profile /> : <Navigate to="/login" /> } />
-          <Route path="/cart" element={ isAuthenticated ? <Cart /> : <Navigate to="/login" /> } />
+          <Route path="/login" element={<Login />} />
+          
+          {/* Protected routes - Wrapped with PersistLogin */}
+          <Route element={<PersistLogin />}>
+            {/* These routes require authentication */}
+            <Route element={<RequireAuth />}>
+              <Route path='/add-product' element={<AddProduct />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/cart" element={<Cart />} />
+              {/* Add other protected routes here */}
+            </Route>
+          </Route>
         </Route>
       </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

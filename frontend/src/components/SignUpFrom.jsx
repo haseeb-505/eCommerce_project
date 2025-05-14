@@ -7,14 +7,16 @@ import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid";
 import axiosApi from "../utils/AxiosApi.js";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { useRegisterUserMutation } from '../redux/authentication/authApi.js'; // update path as needed
-
+import { useRegisterMutation } from "../redux/authentication/authApiSlice.js"; // update path as needed
 
 // Validation schema
 const schema = yup.object().shape({
   username: yup.string().required("Username is required").min(3),
   email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required("Password is required").min(6, "Password must be at least 6 characters"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters"),
   fullName: yup.string().required("Full name is required"),
   avatar: yup
     .mixed()
@@ -63,7 +65,7 @@ const SignupForm = () => {
   const [coverPhotoPreview, setCoverPhotoPreview] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [registerUser, { isLoading: isSubmitting}] = useRegisterUserMutation();
+  const [registerUser, { isLoading: isSubmitting }] = useRegisterMutation();
 
   const onSubmit = async (data) => {
     // setIsSubmitting(true);
@@ -84,21 +86,22 @@ const SignupForm = () => {
       // console.log("response is: ", response)
 
       // Check for success in different possible response structures
-    if (response.success || response.data?.success) {
-      toast.success("Signup successful! Redirecting...");
-      setTimeout(() => navigate('/login'), 2000);
-    } else {
-      const errorMsg = response.message || response.data?.message || "Signup failed";
-      toast.error(errorMsg);
-    }
+      if (response.success || response.data?.success) {
+        toast.success("Signup successful! Redirecting...");
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        const errorMsg =
+          response.message || response.data?.message || "Signup failed";
+        toast.error(errorMsg);
+      }
     } catch (error) {
       if (error.response) {
-        toast.error(error.response.data.message || "Signup failes")
-      } else if (error.request){
-        toast.error("No response from server. Please try again.")
+        toast.error(error.response.data.message || "Signup failes");
+      } else if (error.request) {
+        toast.error("No response from server. Please try again.");
       } else {
-        console.log("An unexpected error occurred. ", error)
-        toast.error("An unexpected error occurred. ", error)
+        console.log("An unexpected error occurred. ", error);
+        toast.error("An unexpected error occurred. ", error);
       }
     }
   };
