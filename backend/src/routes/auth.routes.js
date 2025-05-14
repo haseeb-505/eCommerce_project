@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { 
+    refreshAccessToken,
     registerUser,
     loginUser,
     getCurrentUser,
@@ -30,6 +31,8 @@ router.route("/register").post(
 
 // login route
 router.route("/login").post(loginUser);
+// refresh rout
+router.route("/refresh").get(refreshAccessToken);
 
 // check auth route, inject verifyJWT middleware
 router.route("/check-auth").get(verifyJWT, getCurrentUser);
