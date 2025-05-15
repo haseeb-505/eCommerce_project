@@ -37,7 +37,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         process.env.REFRESH_TOKEN_SECRET
       );
   
-      const user = await User.findById(decodedToken?._id);
+      const user = await User.findById(decodedToken?._id).select("-password");
   
       if (!user) {
         throw new ApiError(401, "Invalid refresh token");
@@ -61,7 +61,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         .json(
           new ApiResponse(
             200,
-            { accessToken, refreshToken: newRefreshToken },
+            { user, accessToken, refreshToken: newRefreshToken },
             "Access token refreshed"
           )
         );
