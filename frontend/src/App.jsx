@@ -14,28 +14,34 @@ import Cart from './components/Cart.jsx';
 import Profile from './components/Profile.jsx';
 import PersistLogin from './components/PersistLogin'; // Import the PersistLogin component
 import RequireAuth from './components/RequireAuth'; // We'll create this
+import { useSelector } from 'react-redux';
+import LoadingScreen from './components/LoadingScreen';
 
 function App() {
-  // We can remove the isLoading check from here since PersistLogin will handle it
+
   return (
     <div className='bg-slate-900 text-white'>
       <Routes>
         <Route element={<Layout />}>
           {/* Public routes */}
-          <Route path='/' element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          
-          {/* Protected routes - Wrapped with PersistLogin */}
+
+          {/* Protected routes */}
           <Route element={<PersistLogin />}>
-            {/* These routes require authentication */}
+            {/* Public routes that persist login */}
+            <Route path='/' element={<Home />} />
+            
+            {/* Authenticated-only routes */}
             <Route element={<RequireAuth />}>
               <Route path='/add-product' element={<AddProduct />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/cart" element={<Cart />} />
-              {/* Add other protected routes here */}
             </Route>
           </Route>
+
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
     </div>

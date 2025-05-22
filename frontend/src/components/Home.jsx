@@ -3,6 +3,8 @@ import axiosApi from "../utils/AxiosApi.js";
 import { fetchAllProducts, fetchCategories, getProductsByCategories } from "../utils/productServiceApi.js";
 import { handleApiCall } from "../utils/handleApiCalls.js";
 import { toast, ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -11,6 +13,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [filtering, setFiltering] = useState(false);
+  const { isAuthenticated, user } = useSelector(state => state.auth);
 
   // handleCheckboxChange
   const handleCheckboxChange = (category) => {
@@ -33,8 +36,17 @@ const Home = () => {
 
   return (
     <div className="pt-13 md:pt-18 lg:pt-13 pb-15 bg-slate-700 min-h-[calc(100vh-120px)]">
+      {isAuthenticated ? (
+        <div className="text-center text-white text-2xl mt-10 py-2">
+          Welcome back, {user.username}!
+        </div>
+      ) : (
+        <div className="text-center text-white text-xl sm:mt-14 md:mt-12 lg:mt-16 py-2">
+          Welcome guest! <Link className="bg-green-600 text-white hover:text-blue-600 p-1 border-2 border-white rounded-lg cursor-pointer" to="/login">Login</Link> for personalized features
+        </div>
+      )}
       <div className="text-center">
-        <h1 className="text-xl md:text-3xl bg-green-700 font-medium font-serif mb-2 mt-14 sm:mt-14 md:mt-9 lg:mt-14 p-1 border-2 border-white rounded-lg">Categories</h1>
+        <h1 className="text-xl md:text-3xl bg-green-700 font-medium font-serif mb-2 mt-5 sm:mt-2 md:mt-2 lg:mt-2 p-1 border-2 border-white rounded-lg">Categories</h1>
         <div className="flex justify-center flex-wrap gap-4 mb-6 mt-4 bg-red-500 text-black border-2 border-white rounded-2xl">
           {categories.map((category) => (
             <label key={category} className="flex items-center space-x-2 text-black text-lg">

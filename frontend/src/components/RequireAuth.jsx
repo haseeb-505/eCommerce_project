@@ -1,14 +1,20 @@
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet } from 'react-router-dom';
-import { selectCurrentToken } from '../redux/authentication/authSlice';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 const RequireAuth = () => {
-  const token = useSelector(selectCurrentToken);
-  console.log("\n\nToken in requireAuth is: ", token);
-  
-  return token
-    ? <Outlet />
-    : <Navigate to="/login" replace />;
+  const { isAuthenticated, isInitialCheckComplete } = useSelector((state) => state.auth);
+  const location = useLocation();
+
+  if (!isInitialCheckComplete) {
+    // PersistLogin handles the loading state
+    return null;
+  }
+
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" state={{ from: location }} replace />
+  );
 };
 
 export default RequireAuth;

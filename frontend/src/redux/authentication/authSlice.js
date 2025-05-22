@@ -5,44 +5,65 @@ const authSlice = createSlice({
   initialState: {
     user: null,
     isAuthenticated: false,
-    accessToken: null
+    accessToken: null,
+    isRefreshing: false,
+    isInitialCheckComplete: false,
   },
   reducers: {
     setUserInfo: (state, action) => {
       if (!action.payload) {
         console.error("No payload provided to setUserInfo");
-        return;
+        return state;
       }
-
-      // console.log("payload is: ", action.payload);
 
       const { user, accessToken, isAuthenticated } = action.payload;
-
-      if (!user) {
-        console.error("Invalid user in payload");
-        state.error = "Invalid user";
+      if (!user || !isAuthenticated) {
+        console.error("Invalid user or authentication status in payload");
+        state.user = null;
+        state.isAuthenticated = false;
+        state.accessToken = null;
+        state.isInitialCheckComplete = true;
+        state.isRefreshing = false;
         return;
       }
 
+      // Valid payload case
       state.user = user;
-      state.isAuthenticated = isAuthenticated !== undefined ? isAuthenticated : true;
+      state.isAuthenticated = true;
       state.accessToken = accessToken;
+      state.isInitialCheckComplete = true;
+      state.isRefreshing = false;
     },
-    
-    // setCredentials: (state, action) => {
-    //   const { accessToken } = action.payload;
-    //   state.token = accessToken;
-    // },
+
+    // refreshing state
+    setRefreshing: (state, action) => {
+      state.isRefreshing = action.payload;
+    },
     
     logOut: (state) => {
       state.user = null;
       state.isAuthenticated = false;
       state.accessToken = null;
+      state.isInitialCheckComplete = true;
+      state.isRefreshing =  false;
+    },
+
+    setAuthCheckComplete: (state) => {
+      state.isInitialCheckComplete = true;
+      state.isRefreshing = false;
+    },
+
+    resetAuthState: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.accessToken = null;
+      state.isRefreshing = false;
+      state.isInitialCheckComplete = true;
     }
   }
 });
 
-export const { setUserInfo, clearUserInfo, setCredentials, logOut } = authSlice.actions;
+export const { setUserInfo, setRefreshing, logOut, setAuthCheckComplete, resetAuthState } = authSlice.actions;
 export default authSlice.reducer;
 
 export const selectCurrentToken = (state) => state.auth.accessToken;
