@@ -4,7 +4,7 @@ import asyncHandler from "../utils/asyncHandlers.js";
 import { User } from "../models/user.models.js";
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
-    console.log("We are in verify jwt");
+
     try {
         // 1. Get token from cookies or Authorization header
         const token = req.cookies?.accessToken || 

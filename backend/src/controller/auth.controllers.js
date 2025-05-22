@@ -23,53 +23,6 @@ const generateAccessRefreshToken = async (userId) => {
     }
 };
 
-// In your auth controller
-const refreshAccessToken = asyncHandler(async (req, res) => {
-    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
-    
-    if (!incomingRefreshToken) {
-      throw new ApiError(401, "Unauthorized request");
-    }
-  
-    try {
-      const decodedToken = jwt.verify(
-        incomingRefreshToken,
-        process.env.REFRESH_TOKEN_SECRET
-      );
-  
-      const user = await User.findById(decodedToken?._id).select("-password");
-  
-      if (!user) {
-        throw new ApiError(401, "Invalid refresh token");
-      }
-  
-      if (incomingRefreshToken !== user?.refreshToken) {
-        throw new ApiError(401, "Refresh token is expired or used");
-      }
-  
-      const { accessToken, refreshToken: newRefreshToken } = await generateAccessRefreshToken(user._id);
-  
-      const options = {
-        httpOnly: true,
-        secure: true,
-      };
-  
-      return res
-        .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", newRefreshToken, options)
-        .json(
-          new ApiResponse(
-            200,
-            { user, accessToken, refreshToken: newRefreshToken },
-            "Access token refreshed"
-          )
-        );
-    } catch (error) {
-      throw new ApiError(401, error?.message || "Invalid refresh token");
-    }
-  });
-
 // controller functions
 
 const registerUser = asyncHandler( async (req, res) => {
@@ -219,6 +172,10 @@ const loginUser = asyncHandler(async (req, res) => {
         )
     };
 
+    // if (!user || !(await user.matchPassword(password))) {
+    //     throw new Error('Invalid credentials');
+    // }
+
     // generate accessToken and refreshToken
     const { accessToken, refreshToken } = await generateAccessRefreshToken(user._id);
     if (!accessToken || !refreshToken) {
@@ -227,12 +184,14 @@ const loginUser = asyncHandler(async (req, res) => {
         )
     };
 
+    await User.findByIdAndUpdate(user._id, { isLoggedIn: true }, { new: true });
+
     // remove password and refreshToken from user object of send user in response
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
     return res.status(200)
-        .cookie("accessToken", accessToken, {httpOnly: true, secure: true, maxAge: 1000 * 60 * 15})
-        .cookie("refreshToken", refreshToken, {httpOnly: true, secure: true, maxAge: 1000 * 60 * 60 * 24})
+        .cookie("accessToken", accessToken, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 15 })
+        .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 60 * 24 })
         .json(
             new ApiResponse(200, { user: loggedInUser, accessToken }, "user loggdIn successfully")
         )
@@ -242,7 +201,7 @@ const loginUser = asyncHandler(async (req, res) => {
 // check user auth or getCurrentUser
 const getCurrentUser = asyncHandler(async (req, res) => {
     const id = req.user?._id;
-    console.log("User ID from token:", id);
+    // console.log("User ID from token:", id);
     if (id === undefined) {
         return res.status(400).json(
             new ApiResponse(403, null, "User is not logged in")
@@ -250,7 +209,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findById(id).select("-password -accessToken");
-    console.log("Current user is: ", user)
+    // console.log("Current user is: ", user)
 
 
     return res.status(200).json(
@@ -271,16 +230,16 @@ const logoutUser = asyncHandler(async (req, res) => {
     // if it has access token, we extract the _id from the decode payload(we sent when creating the accesstoken)
 
     await User.findByIdAndUpdate(req.user._id, {
+        // set isLoggedIn to false status
+        isLoggedIn: false,
         // update the refresh token to null
         $set: { refreshToken: undefined },
 
     },
-    {
-        new: true,
-    });
+    { new: true });
 
     // need to send the cookies in response
-    options = {
+    const options = {
         httpOnly: true,
         secure: true,
     }
@@ -294,11 +253,100 @@ const logoutUser = asyncHandler(async (req, res) => {
         )
 });
 
+// refreshAccessToken on the basis of valid refreshToken
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    console.log("We are in refreshAccess Token")
+
+    const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+    // console.log("Refresh token is: ", incomingRefreshToken)
+    
+    if (!incomingRefreshToken) {
+      return res.status(204).json(
+        new ApiResponse(204, null, { message: 'No content. User likely logged out.' })
+      );
+    }
+  
+    try {
+      const decodedToken = jwt.verify(
+        incomingRefreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+      );
+  
+      const user = await User.findById(decodedToken?._id).select("-password");
+  
+      if (!user) {
+        throw new ApiError(401, "Invalid refresh token");
+      }
+
+      if (!user.isLoggedIn) {
+      console.log(`User ${user.username} not logged in, isLoggedIn: false`);
+      throw new ApiError(401, "User is not logged in");
+    }
+  
+      if (incomingRefreshToken !== user?.refreshToken) {
+        throw new ApiError(401, "Refresh token is expired or used");
+      }
+  
+      const { accessToken, refreshToken: newRefreshToken } = await generateAccessRefreshToken(user._id);
+  
+      const options = {
+        httpOnly: true,
+        secure: true,
+      };
+  
+      return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", newRefreshToken, options)
+        .json(
+          new ApiResponse(
+            200,
+            { user, accessToken, refreshToken: newRefreshToken },
+            "Access token refreshed"
+          )
+        );
+    } catch (error) {
+      throw new ApiError(401, error?.message || "Invalid refresh token");
+    }
+  });
+
+// checkLoginStatus
+const checkLoginStatus = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+        return res
+        .status(200)
+        .json(new ApiResponse(200, { isLoggedIn: false }, "No refresh token provided"));
+    }
+
+    try {
+        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const user = await User.findById(decodedToken._id).select("isLoggedIn username");
+
+        if (!user) {
+            return res
+                .status(200)
+                .json(new ApiResponse(200, { isLoggedIn: false }, "User not found"));
+        }
+
+        console.log(`Check-login-status for user ${user.username}: isLoggedIn = ${user.isLoggedIn}`);
+        return res
+            .status(200)
+            .json(new ApiResponse(200, { isLoggedIn: user.isLoggedIn }, "Login status checked"));
+
+    } catch (error) {
+        console.log("Invalid refreshToken for check-login-status:", err.message);
+        return res
+            .status(200)
+            .json(new ApiResponse(200, { isLoggedIn: false }, "Invalid refresh token"));
+    }
+})
 
 export  { 
-    refreshAccessToken,
     registerUser,
     loginUser,
     getCurrentUser,
     logoutUser,
+    checkLoginStatus,
+    refreshAccessToken,
 }
